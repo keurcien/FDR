@@ -16,7 +16,7 @@ compute.power = function(list,ground.truth){
   return(x)
 }
 
-create.fdr.pow = function(list,ground.truth,lmax){
+create.fdr.pow = function(list,ground.truth,lmax=length(list),smooth=FALSE){
   fdr <- 0
   pow <- 0
   s <- seq(1,lmax,by = 1)
@@ -24,11 +24,39 @@ create.fdr.pow = function(list,ground.truth,lmax){
     l <- list[1:k]
     fdr <- c(fdr,compute.fdr(l,ground.truth))
     pow <- c(pow,compute.power(l,ground.truth))
-    print(compute.fdr(l,ground.truth))
   }
   res <- NULL
   idx <- sort(fdr,decreasing = FALSE,index.return = TRUE)$ix
-  res$fdr <- fdr[idx]
-  res$pow <- pow[idx]
+  if (smooth==FALSE){
+    res$fdr <- fdr[idx]
+    res$pow <- pow[idx]
+  } else if (smooth==TRUE){
+    pow.old <- 0
+    fdr.old <- 0
+    aux.fdr <- 0
+    aux.pow <- 0
+    for (val in 1:length(fdr)){
+      if (pow[val] >= pow.old){
+        aux.fdr <- c(aux.fdr,fdr[val])
+        aux.pow <- c(aux.pow,pow[val])
+        pow.old <- pow[val]
+      }
+    }
+    res$fdr <- aux.fdr
+    res$pow <- aux.pow
+  }
   return(res)
 }
+
+create.df = function(res,soft.name){
+  ncol <- length(res$fdr)
+  df <- array(0,dim=c(ncol,3))
+  df[,1] <- rep(soft.name,ncol)
+  df[,2] <- res$fdr
+  df[,3] <- res$pow
+  return(as.data.frame(df))
+}
+  
+
+
+

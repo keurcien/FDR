@@ -1,0 +1,48 @@
+---
+title: "FDR"
+output: html_document
+---
+
+### THIS PAGE IS NOT UP-TO-DATE ###
+
+The functions `compute.fdr` and `compute.power` defined below respectively compute the values of FDR and power for a list of candidates (`list`) and a given list of true positives (`ground.truth`).
+
+Now if you want to plot the power as a function of the false discovery rate, you need to compute both power and FDR for any list of candidates which length should ideally vary from one to the total number of markers. Basically what you want to do is ranking your markers according to their p-value, then compute both FDR and power for the marker with the lowest p-value, store both values in a data frame, then add the second marker with the lowest p-value, compute both FDR and power, store them in the data frame, and so on. The function below takes on these computations.
+
+```{r}
+source("~/Documents/thesis/git/FDR/fdrUtils.R")
+gt <- 50:100
+rank.stat.1 <- unique(c(c(51,70,35,74,88),floor(runif(n = 500, min = 1, max = 300))))
+rank.stat.2 <- unique(c(c(64,89,91,99,100),floor(runif(n = 500, min = 1, max = 300))))
+```
+
+```{r}
+# Generate fdr and power values for each method:
+res.1 <- create.fdr.pow(rank.stat.1,gt,smooth = TRUE)
+df.1 <- create.df(res.1,"method1")
+res.2 <- create.fdr.pow(rank.stat.2,gt,smooth = TRUE)
+df.2 <- create.df(res.2,"method2")
+
+df <- rbind(df.1,df.2)
+colnames(df) <- c("Software","FDR","Power")
+df[,1] <- as.character(df[,1])
+df[,2] <- as.numeric(as.character(df[,2]))
+df[,3] <- as.numeric(as.character(df[,3]))
+```
+
+```{r}
+require(ggplot2)
+p0 <- ggplot(data = df,aes(x=FDR,y=Power)) + 
+  geom_line(aes(linetype=Software, color=Software),size=2,na.rm = TRUE) +
+  xlim(0,1) + ylim(0,1) +
+  theme_bw() +
+  theme(axis.text=element_text(size=25),
+        axis.title=element_text(size=25,face="bold"),
+        title=element_text(size=25,face="bold"),
+        legend.text=element_text(size=25),
+        legend.key.height=unit(3,"line"),
+        legend.key.width=unit(5,"line")
+  )
+print(p0)
+```
+
