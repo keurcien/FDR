@@ -27,9 +27,11 @@ create.fdr.pow = function(list,ground.truth,lmax=length(list),smooth=FALSE){
   }
   res <- NULL
   idx <- sort(fdr,decreasing = FALSE,index.return = TRUE)$ix
+  fdr <- fdr[idx]
+  pow <- pow[idx]
   if (smooth==FALSE){
-    res$fdr <- fdr[idx]
-    res$pow <- pow[idx]
+    res$fdr <- fdr
+    res$pow <- pow
   } else if (smooth==TRUE){
     pow.old <- 0
     fdr.old <- 0
@@ -56,7 +58,3 @@ create.df = function(res,soft.name){
   df[,3] <- res$pow
   return(as.data.frame(df))
 }
-  
-
-
-
