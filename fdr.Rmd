@@ -3,17 +3,8 @@ title: <center><span style="color:SteelBlue">FDR</span></center>
 output: html_document
 ---
 
-
-```{r, include = FALSE}
-library(pcadapt)
-```
-
-```{r, eval = FALSE}
-library(pcadapt)
-```
-
-
 ```{r}
+library(pcadapt)
 source("~/Documents/thesis/git/FDR/fdrUtils.R")
 geno <- as.matrix(read.table(system.file("extdata", "geno3pops.pcadapt", package = "pcadapt")))
 gt <- 1:150
